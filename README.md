@@ -11,13 +11,13 @@ We present a new compressed sensing framework for multiple measurements of spars
 
 We recommend starting with demo_script_groups.py to become familiar with the components of SPoRe. This file can be run immediately to generate simulations and evaluate SPoRe's recovery performance with desired parameter settings. Understanding this demo script will require digging into specific files in the 'spore' folder, which contains the functionality of SPoRe.
 
-# spore/
+## spore/
 In short: 
 - mmv_utils.py: Generates Poisson signal matrices (X*)
 - mmv_models.py: Defines models for the probabilistic mapping of signal-to-measurements (X*->Y)
 - spore.py: SPoRe algorithm and class for Monte Carlo sampling functions
 
-# Custom Models with mmv_models.py
+## Custom Models with mmv_models.py
 Our initial exploration focuses on linear signal-to-measurement models, but SPoRe is modular for any model that defines the conditional probability p(y|x). Users may want to define a custom application-specific model for their measurements. Our implementations of the linear models with Gaussian noise should serve as a useful template for defining your own models. Briefly: 
 - A child of the FwdModel class can be created and customized. 
 - Use FwdModelGroup to define 'sensor groups' [1] each with different forward models.
