@@ -4,8 +4,8 @@ Sparse Poisson Recovery (SPoRe)
 We present a new compressed sensing framework for multiple measurements of sparse Poisson signals. We are primarily motivated by a suite of biosensing applications of microfluidics where analytes (such as whole cells or biomarkers) are captured in small volume partitions according to a Poisson distribution. We recover the sparse parameter vector of Poisson rates through maximum likelihood estimation with our novel Sparse Poisson Recovery(SPoRe) algorithm.  SPoRe uses batch stochastic gradient ascent enabled by Monte Carlo approximations of otherwise intractable gradients.
 
 ## Publications
-[1] P. K. Kota, D. LeJeune, R. A. Drezek, and R. G. Baraniuk, "Extreme Compressed Sensing of Poisson Rates from Multiple Measurements," 2021
--arXiv submission is currently processing and set to be announced March 17 0:00 GMT
+[1] P. K. Kota, D. LeJeune, R. A. Drezek, and R. G. Baraniuk, "Extreme Compressed Sensing of Poisson Rates from Multiple Measurements," arXiv: 2103.08711, 2021
+
 
 ## Instructions
 
