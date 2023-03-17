@@ -1,0 +1,27 @@
+1. Generate lambda estimates with python script ('ddpcr_lam_est_final.py')
+2. Save to '22-07-13_concs.mat' 
+- note A1->12 is alphabetical bacterial order, as is B12->1. Staph and Strep grouped
+3. Note A09 had corrupt ddPCR data (S. epid concentration #1) - happened to not be used in samples 
+
+
+Note that samples with 'concentration 1' and 'concentration 2' were decided before the experiment,
+and the following is to combine the ground truth lambdas into the heatmap
+
+4. Generate the 'lamTrue' file
+- open rand_sample_combos_weighted.m
+- load in mat file with 'concs'
+- run
+- combine the generated heatmap variables into one lamTrue array
+- lamTrue ~= [heatMaps(1), heatMaps(2), heatMaps(3)]
+
+
+lamTrue = [heatMaps{1}, heatMaps{2}, heatMaps{3}]
+lamTrue(:,[11, 12]) = lamTrue(:,[12, 11])
+lamTrue(:,6) = 0
+
+- Note that sparsity 3, samples 5 and 6 were switched on the plate, so manually flipped them (columns 5 and 6 in heatMaps(2))
+- lamTrue(:,6) = 0 (negative control)
+
+
+5. ecloac_p (probability of its HEX probe 1) is estimated as ~0.83
+	- see ddpcr_lam_est_final.py 
