@@ -452,6 +452,86 @@ class PhiGaussianPlusUnif(PhiGaussianPlusOnes):
                 phis[:,:,g] = phis[:,:,g] / np.linalg.norm(phis[:,:,g], axis=0)
                 
         return phis
+    
+class BooleanBernoulliNoise(FwdModel): 
+    def __init__(self, Phi, p_flip): 
+        """
+        Measurements reduced to True or False with some probability of error
+        Parameters
+        ----------
+        Phi : array_like
+            Shape ``(M, N)``            
+        pFlip : float (0,1)
+            Probability of getting the wrong measurement. P(y=False| actually True), vice versa
+        """
+        self.Phi = Phi 
+        self.p_flip = p_flip 
+    def x2y(self, X): 
+        Y = (self.Phi @ X).astype('bool')
+        # Flip random values in Y        
+        flipInds = np.random.uniform(size=(Y.shape)) < self.p_flip
+        Y[flipInds] = np.invert(Y[flipInds])        
+        return Y
+    
+    def py_x(self, Y, X): # (S, B) array
+        # Y is (M, 1, B) 
+        # X is (N, S, 1) or (N, S, B)
+        
+        # Y is (M, ...)
+        mu = np.einsum('ij,j...->i...', self.Phi, X).astype('bool') # (M, ...) 
+        Diff = np.logical_xor(Y, mu) # (M, S, B)
+        numWrong = np.sum(Diff, axis=0) # (S, B) 
+        
+        numRight = np.sum(np.invert(Diff), axis=0)
+        #return self.p_flip**numWrong
+        return self.p_flip**numWrong * (1-self.p_flip)**numRight # fix on 3/11/2021
+    
+    @property
+    def output_dim(self): 
+        return self.Phi.shape[:1]
+
+
+class BooleanYwithMixtureX(FwdModel): 
+    def __init__(self, BC, BCprob): 
+        """       
+        initial: 7/19/2022
+        Really designed for 16S ddPCR with hard thresholding / binarization
+        ----------
+        BC : array_like
+            Shape: ``(M, 2^M)'' 
+        BCprob : array_like
+            Shape: (2^M , N) with np.sum(BCprob, axis=1) = ones
+            each of N analytes is a mixture across the barcodes
+            
+        """
+        self.BC = BC 
+        self.BCprob = BCprob 
+        
+    def x2y(self, X):
+        M, numBCs = self.BC.shape
+        D = X.shape[1]
+        
+        Y = np.zeros((M, D))
+        for i in range(D): 
+            inds = np.where(X[:,i] != 0)[0]
+            rawMeas = np.zeros(M)
+            for n in inds: 
+                bcInds = np.random.choice(numBCs, p=self.BCprob[:, n], size=X[n,i])
+                rawMeas += np.sum(self.BC[:, bcInds], axis=1)
+ 
+            Y[:, i] = rawMeas > 0
+                
+        return Y 
+    
+    
+    def py_x(self, Y, X): # (S, B) array
+        # Y is (M, 1, B) 
+        pass
+    
+    @property
+    def output_dim(self): 
+        return self.BC.shape[:1]
+
 
 def py_lam(fm, yrange, xMax, N, lamInput):
     
